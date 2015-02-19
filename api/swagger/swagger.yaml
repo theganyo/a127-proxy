@@ -1,0 +1,79 @@
+swagger: "2.0"
+info:
+  title: Proxy App
+  version: "0.0.1"
+host: localhost
+basePath: /
+schemes:
+  - http
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+x-a127-config: {}
+x-a127-services:
+  cache:
+    provider: volos-cache-memory
+    options:
+      name: name
+      ttl: 10000
+  quota:
+    provider: volos-quota-memory
+    options:
+      timeUnit: minute
+      interval: 1
+      allow: 2
+paths:
+  /:
+    x-swagger-router-controller: proxy
+    x-swagger-router-handle-subpaths: true
+    x-a127-apply:
+#      cache: {}
+#        key:
+#          helper: volos
+#          function: cacheKey
+      quota: {}
+    get:
+      operationId: proxy
+      responses:
+        default:
+          description: all
+          schema:
+            $ref: "#/definitions/OpenResponse"
+    put:
+      operationId: proxy
+      responses:
+        default:
+          description: all
+          schema:
+            $ref: "#/definitions/OpenResponse"
+    post:
+      operationId: proxy
+      responses:
+        default:
+          description: all
+          schema:
+            $ref: "#/definitions/OpenResponse"
+    delete:
+      operationId: proxy
+      responses:
+        default:
+          description: all
+          schema:
+            $ref: "#/definitions/OpenResponse"
+definitions:
+  HelloWorldResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  OpenResponse:
+    properties: {}
