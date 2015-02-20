@@ -11,29 +11,33 @@ consumes:
   - application/json
 produces:
   - application/json
-x-a127-config: {}
+x-a127-config:
+  RemoteProxy.key: &apigeeProxyKey CONFIGURED
+  RemoteProxy.uri: &apigeeProxyUri CONFIGURED
 x-a127-services:
   cache:
     provider: volos-cache-memory
     options:
       name: name
       ttl: 10000
-  quota:
-    provider: volos-quota-memory
+  # Note: OAuth API Key validation will be applied manually in the controller, not here.
+  # This is to ensure that network errors do not cause the proxy to deny any requests.
+  oauth:
+    provider: volos-oauth-apigee
     options:
-      timeUnit: minute
-      interval: 1
-      allow: 2
+      cache: cache
+      key: *apigeeProxyKey
+      uri: *apigeeProxyUri
 paths:
   /:
     x-swagger-router-controller: proxy
     x-swagger-router-handle-subpaths: true
-    x-a127-apply:
-#      cache: {}
-#        key:
-#          helper: volos
-#          function: cacheKey
-      quota: {}
+    parameters:
+      - name: api_key
+        in: query
+        description: Your API Key
+        required: true
+        type: string
     get:
       operationId: proxy
       responses:
@@ -63,17 +67,12 @@ paths:
           schema:
             $ref: "#/definitions/OpenResponse"
 definitions:
-  HelloWorldResponse:
-    required:
-      - message
-    properties:
-      message:
-        type: string
-  ErrorResponse:
-    required:
-      - message
-    properties:
-      message:
-        type: string
   OpenResponse:
     properties: {}
+#securityDefinitions:
+#  oauth:
+#    type: oauth2
+#    scopes:
+#      read: read access
+#    flow: application
+#    tokenUrl: ignored
